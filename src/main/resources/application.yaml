@@ -1,0 +1,29 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /demo_identity
+
+jwt:
+  signerKey: "dMdmti3OHFdzZd5+O7x2o7aKWZGyWjHXRrRbIf9LgyqN49og9fADDDcAUcoNleSi"
+
+spring:
+  application:
+    name: demo-application
+  datasource:
+    url: jdbc:mysql://localhost:3304/identity_service
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  security:
+    user:
+      name: user
+      password: 123456abc
+      roles: USER
+      oauth2: true
