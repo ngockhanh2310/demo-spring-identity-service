@@ -4,13 +4,12 @@ import com.khanh.demo.dto.request.ApiResponse;
 import com.khanh.demo.dto.request.UserCreationRequest;
 import com.khanh.demo.dto.request.UserUpdateRequest;
 import com.khanh.demo.dto.response.UserResponse;
-import com.khanh.demo.entity.User;
-import com.khanh.demo.repository.UserRepository;
 import com.khanh.demo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,43 +20,58 @@ import java.util.List;
 @Slf4j
 public class UserController {
     private final UserService userService;
-    private final UserRepository userRepository;
 
     // Create user
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    ApiResponse<User> createUser(@RequestBody @Valid UserCreationRequest request) {
-        ApiResponse apiResponse = new ApiResponse();
-        apiResponse.setResult(userService.createUser(request));
-        apiResponse.setMessage("User created successfully");
-        return apiResponse;
+    ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
+        return ApiResponse.<UserResponse>builder()
+                .message("User has been created")
+                .result(userService.createUser(request))
+                .build();
     }
 
     // Get all user
     @GetMapping
-    List<User> getUsers() {
-        return userService.getAllUsers();
+    ApiResponse<List<UserResponse>> getUsers() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        log.info("Username : {}", authentication.getName());
+        authentication.getAuthorities().forEach(authority -> log.info("Role : {}", authority.getAuthority()));
+
+        return ApiResponse.<List<UserResponse>>builder()
+                .result(userService.getAllUsers())
+                .build();
+    }
+
+    // Get info user
+    @GetMapping("/myInfo")
+    ApiResponse<UserResponse> getMyInfo() {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getMyInfo())
+                .build();
     }
 
     // Get user by ID
     @GetMapping("/{userId}")
-    UserResponse getUser(@PathVariable("userId") String userId) {
-        return userService.getUserResponse(userId);
+    ApiResponse<UserResponse> getUser(@PathVariable("userId") String userId) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getUser(userId))
+                .build();
     }
 
     // Update user
     @PutMapping("/{userId}")
-    UserResponse updateUser(@PathVariable("userId") String userId, @RequestBody UserUpdateRequest request) {
-        return userService.updateUserResponse(userId, request);
+    ApiResponse<UserResponse> updateUser(@PathVariable("userId") String userId, @RequestBody UserUpdateRequest request) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.updateUser(userId, request))
+                .build();
     }
 
     // Delete user by ID
     @DeleteMapping("/{userId}")
-    String deleteUser(@PathVariable("userId") String userId) {
-        if (userRepository.existsById(userId)) {
-            userService.deleteUser(userId);
-            return "User deleted successfully";
-        }
-        return "User not found";
+    ApiResponse<String> deleteUser(@PathVariable String userId) {
+        userService.deleteUser(userId);
+        return ApiResponse.<String>builder().result("User has been deleted").build();
     }
 }

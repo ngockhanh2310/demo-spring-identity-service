@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -14,9 +15,9 @@ import java.time.LocalDate;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse {
+    Set<RoleResponse> roles;
     private String id;
     private String username;
-    private String password;
     private String firstName;
     private String lastName;
     private LocalDate dob;

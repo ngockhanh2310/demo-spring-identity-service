@@ -6,12 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
 public class UserUpdateRequest {
+    List<String> roles;
     private String password;
     private String firstName;
     private String lastName;

@@ -1,20 +1,21 @@
 package com.khanh.demo.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Table(name = "user")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 public class User {
+    @ManyToMany
+    Set<Role> roles;
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
