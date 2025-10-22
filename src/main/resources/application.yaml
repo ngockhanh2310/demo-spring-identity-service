@@ -5,15 +5,19 @@ server:
 
 jwt:
   signerKey: "dMdmti3OHFdzZd5+O7x2o7aKWZGyWjHXRrRbIf9LgyqN49og9fADDDcAUcoNleSi"
+  valid-duration: 3600 # in seconds
+  refreshable-duration: 86400 # in seconds
 
 spring:
   application:
     name: demo-application
+
   datasource:
     url: jdbc:mysql://localhost:3304/identity_service
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -21,9 +25,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
   security:
     user:
       name: user
-      password: 123456abc
+      password: 123456
       roles: USER
       oauth2: true

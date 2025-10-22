@@ -1,5 +1,6 @@
 package com.khanh.demo.dto.request;
 
+import com.khanh.demo.validator.DobConstraint;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -20,5 +21,6 @@ public class UserCreationRequest {
     private String password;
     private String firstName;
     private String lastName;
+    @DobConstraint(min = 16, message = "INVALID_DOB")
     private LocalDate dob;
 }

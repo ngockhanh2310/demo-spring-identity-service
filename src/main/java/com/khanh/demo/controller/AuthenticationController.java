@@ -1,8 +1,6 @@
 package com.khanh.demo.controller;
 
-import com.khanh.demo.dto.request.ApiResponse;
-import com.khanh.demo.dto.request.AuthenticationRequest;
-import com.khanh.demo.dto.request.IntrospectRequest;
+import com.khanh.demo.dto.request.*;
 import com.khanh.demo.dto.response.AuthenticationResponse;
 import com.khanh.demo.dto.response.IntrospectResponse;
 import com.khanh.demo.service.AuthenticationService;
@@ -40,4 +38,22 @@ public class AuthenticationController {
                 .result(result)
                 .build();
     }
+
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestBody LogoutRequest request)
+            throws ParseException, JOSEException {
+        authenticationService.logout(request);
+        return ApiResponse.<Void>builder()
+                .build();
+    }
+
+    @PostMapping("/refresh")
+    ApiResponse<AuthenticationResponse> authenticate(@RequestBody RefreshRequest request)
+            throws ParseException, JOSEException {
+        var result = authenticationService.refreshToken(request);
+        return ApiResponse.<AuthenticationResponse>builder()
+                .result(result)
+                .build();
+    }
+
 }

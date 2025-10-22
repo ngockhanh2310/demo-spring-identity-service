@@ -32,6 +32,7 @@ public class UserService {
 
     // Create user
     public UserResponse createUser(UserCreationRequest request) {
+        log.info("Service: Create user");
         // check username exist
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new AppException(ErrorCode.USERNAME_EXIST);

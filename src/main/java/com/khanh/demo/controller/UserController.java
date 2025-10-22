@@ -23,8 +23,9 @@ public class UserController {
 
     // Create user
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
+        log.info("Controller: Create user");
         return ApiResponse.<UserResponse>builder()
                 .message("User has been created")
                 .result(userService.createUser(request))
@@ -37,7 +38,8 @@ public class UserController {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
 
         log.info("Username : {}", authentication.getName());
-        authentication.getAuthorities().forEach(authority -> log.info("Role : {}", authority.getAuthority()));
+        authentication.getAuthorities().forEach(authority ->
+                log.info("Role : {}", authority.getAuthority()));
 
         return ApiResponse.<List<UserResponse>>builder()
                 .result(userService.getAllUsers())
