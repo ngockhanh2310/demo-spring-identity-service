@@ -1,9 +1,11 @@
 package com.khanh.demo.service;
 
 import com.khanh.demo.dto.request.UserCreationRequest;
+import com.khanh.demo.dto.request.UserUpdateRequest;
 import com.khanh.demo.dto.response.UserResponse;
 import com.khanh.demo.entity.User;
 import com.khanh.demo.exception.AppException;
+import com.khanh.demo.repository.RoleRepository;
 import com.khanh.demo.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
@@ -23,7 +25,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -35,10 +38,13 @@ public class UserServiceTest {
 
     @MockitoBean
     private UserRepository userRepository;
-
+    @MockitoBean
+    private RoleRepository roleRepository;
     private UserCreationRequest userCreationRequest;
     private UserResponse userResponse;
+    private UserUpdateRequest userUpdateRequest;
     private User user;
+
     private LocalDate dob;
 
     @BeforeEach
@@ -65,6 +71,13 @@ public class UserServiceTest {
                 .firstName("John")
                 .lastName("Wick")
                 .dob(dob)
+                .build();
+        userUpdateRequest = UserUpdateRequest.builder()
+                .password("012345678")
+                .firstName("Jack")
+                .lastName("Sparrow")
+                .dob(LocalDate.parse("2000-01-01"))
+                .roles(List.of("ADMIN", "USER"))
                 .build();
     }
 
@@ -147,4 +160,64 @@ public class UserServiceTest {
         // THEN
         Assertions.assertThat(exception.getMessage()).isEqualTo("User not found");
     }
+
+    @Test
+    @WithMockUser(username = "JohnWick", authorities = {"ROLE_ADMIN"})
+    void updateUser_validRequest_success() {
+        // GIVEN
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+        when(userRepository.save(any())).thenReturn(user);
+        when(roleRepository.findAllById(any())).thenReturn(List.of());
+        // WHEN
+        var result = userService.updateUser("j1i4ba5na213ba", userUpdateRequest);
+        // THEN
+
+        // THEN
+        Assertions.assertThat(result.getUsername()).isEqualTo("JohnWick");
+        Assertions.assertThat(result.getFirstName()).isEqualTo("Jack");
+        Assertions.assertThat(result.getLastName()).isEqualTo("Sparrow");
+        Assertions.assertThat(result.getDob()).isEqualTo(LocalDate.of(2000, 1, 1));
+    }
+
+    @Test
+    @WithMockUser(username = "JohnWick", authorities = {"ROLE_ADMIN"})
+    void updateUser_userNotFound_error() {
+        // GIVEN
+        when(userRepository.findById(anyString())).thenReturn(Optional.empty());
+        // WHEN
+        var exception = assertThrows(RuntimeException.class, () -> userService.updateUser("j1i4ba5na213ba", userUpdateRequest));
+        // THEN
+        Assertions.assertThat(exception.getMessage()).isEqualTo("User not found");
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
+    void deleteUser_validId_success() {
+        // GIVEN
+        String userId = "j1i4ba5na213ba";
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // WHEN
+        userService.deleteUser(userId);
+
+        // THEN
+        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository, times(1)).deleteById(userId);
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
+    void deleteUser_userNotFound_fail() {
+        // GIVEN
+        String userId = "not-exist";
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // WHEN - THEN
+        var exception = assertThrows(AppException.class, () -> userService.deleteUser(userId));
+
+        Assertions.assertThat(exception.getErrorCode().getCode()).isEqualTo(1009);
+        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository, never()).deleteById(anyString());
+    }
+
 }

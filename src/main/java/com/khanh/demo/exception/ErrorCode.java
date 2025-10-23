@@ -15,7 +15,8 @@ public enum ErrorCode {
     INVALID_MESSAGE_KEY(1005, "Invalid message", HttpStatus.BAD_REQUEST),
     UNAUTHENTICATED(1006, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     INVALID_DOB(1008, "User must be at least {min} years old", HttpStatus.BAD_REQUEST),
-    UNAUTHORIZED(1007, "You do not have access to this resource", HttpStatus.FORBIDDEN);
+    UNAUTHORIZED(1007, "You do not have access to this resource", HttpStatus.FORBIDDEN),
+    USER_NOT_FOUND(1009, "User not found", HttpStatus.NOT_FOUND);
 
     private final int code;
     private final String message;

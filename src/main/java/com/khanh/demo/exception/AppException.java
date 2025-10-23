@@ -1,8 +1,10 @@
 package com.khanh.demo.exception;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class AppException extends RuntimeException {
     private ErrorCode errorCode;
 
@@ -10,5 +12,4 @@ public class AppException extends RuntimeException {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
-
 }

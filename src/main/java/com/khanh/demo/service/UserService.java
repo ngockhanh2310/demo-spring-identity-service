@@ -89,6 +89,8 @@ public class UserService {
 
     // Delete user by ID
     public void deleteUser(String userId) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         userRepository.deleteById(userId);
     }
 }
